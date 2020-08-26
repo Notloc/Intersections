@@ -6,14 +6,6 @@ using UnityEngine;
 
 public class CarEntrance : MonoBehaviour
 {
-    public enum Direction
-    {
-        NORTH,
-        EAST,
-        SOUTH,
-        WEST
-    }
-
     [SerializeField] Car[] carPrefabs = null;
 
     [SerializeField] Transform spawnPoint = null;
