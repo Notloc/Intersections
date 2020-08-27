@@ -5,17 +5,23 @@ using UnityEngine;
 
 
 public class CarEntrance : MonoBehaviour
-{
-    [SerializeField] Car[] carPrefabs = null;
+{    
+    float spawnRate = 2.5f;
+    float spawnRandomness = 4f;
 
-    [SerializeField] Transform spawnPoint = null;
-    [SerializeField] Direction direction = Direction.EAST;
-    [SerializeField] CarExit oppositeExit = null;
-
-    [SerializeField] float spawnRate = 6f;
-    [SerializeField] float spawnRandomness = 2f;
+    Car[] carPrefabs;
+    CarExit exit;
+    Road road;
 
     private float spawnTimer = 0f;
+
+
+    public void Initialize(Road road, CarExit exit, Car[] carPrefabs)
+    {
+        this.exit = exit;
+        this.road = road;
+        this.carPrefabs = carPrefabs;
+    }
 
     private void Start()
     {
@@ -36,12 +42,8 @@ public class CarEntrance : MonoBehaviour
     private void SpawnCar()
     {
         Car carPrefab = GetRandomCar();
-        Car car = Instantiate(carPrefab, spawnPoint.transform.position, Quaternion.identity);
-
-        Vector2 dir = GetDirection();
-        float rotation = GetRotation();
-
-        car.Initialize(dir, rotation, oppositeExit);
+        Car car = Instantiate(carPrefab, transform.position, Quaternion.identity);
+        car.Initialize(road, exit);
 
         ResetSpawnTimer();
     }
@@ -50,39 +52,5 @@ public class CarEntrance : MonoBehaviour
     {
         int index = Random.Range(0, carPrefabs.Length);
         return carPrefabs[index];
-    }
-
-    private Vector2 GetDirection()
-    {
-        switch(direction)
-        {
-            case Direction.NORTH :
-                return Vector2.up;
-            case Direction.EAST:
-                return Vector2.right;
-            case Direction.SOUTH:
-                return Vector2.down;
-            case Direction.WEST:
-                return Vector2.left;
-            default:
-                return Vector2.right;
-        }
-    }
-
-    private float GetRotation()
-    {
-        switch (direction)
-        {
-            case Direction.NORTH:
-                return 0f;
-            case Direction.EAST:
-                return 270f;
-            case Direction.SOUTH:
-                return 180f;
-            case Direction.WEST:
-                return 90;
-            default:
-                return 0f;
-        }
     }
 }

@@ -195,13 +195,13 @@ public static class PathGenerator
 
         return true;
 
-        BlockType type = (BlockType)cell.Get(position.x, position.y);
+        TileType type = (TileType)cell.Get(position.x, position.y);
 
         switch (type)
         {
-            case BlockType.NONE:
+            case TileType.NONE:
                 return true;
-            case BlockType.ROAD:
+            case TileType.ROAD:
                 return true;
         }
 

@@ -12,6 +12,7 @@ public class CellGenerator : MonoBehaviour
         Cell newCell = new Cell(coordinates, folder.transform, size);
 
         GenerateIntersection(newCell);
+        GenerateGrass(newCell);
 
         return newCell;
     }
@@ -58,7 +59,7 @@ public class CellGenerator : MonoBehaviour
             {
                 errors.Clear();
                 roadTries++;
-                ConnectRoad(cell, entrance, exit, errors);
+                CreateRoad(cell, entrance, exit, errors);
                 errors.GoBoom();
 
                 break;
@@ -68,41 +69,25 @@ public class CellGenerator : MonoBehaviour
         }
     }
 
-    private void ConnectRoad(Cell cell, CellEntranceExit entrance, CellEntranceExit exit, ErrorCollector errors)
+    private void CreateRoad(Cell cell, CellEntranceExit entrance, CellEntranceExit exit, ErrorCollector errors)
     {
 
         Path path = PathGenerator.GeneratePath(cell, entrance, exit, errors);
+        errors.GoBoom();
 
-        if (errors.Count > 0)
-        {
-            Debug.LogError(errors.GetErrorMessages());
-            errors.Clear();
-            drawPaths.Clear();
-        }
-        DisplayPath(path);
-                
+        Road road = new Road(path);
+        cell.AddRoad(road);
     }
 
-    private void DisplayPath(Path path)
+    private void GenerateGrass(Cell cell)
     {
-        drawPaths.Add(path);
-    }
-
-    private void OnDrawGizmos()
-    {
-        foreach (Path drawPath in drawPaths)
+        for (int x = 0; x < cell.Size; x++)
         {
-            for (int i = 0; i < drawPath.nodes.Count; i++)
+            for (int y = 0; y < cell.Size; y++)
             {
-                Node node = drawPath.nodes[i];
-                if (i == 0)
-                    Gizmos.color = Color.green;
-                else if (i == drawPath.nodes.Count - 1)
-                    Gizmos.color = Color.red;
-                else
-                    Gizmos.color = Color.white;
-
-                Gizmos.DrawCube(new Vector3(node.position.x, node.position.y, 0f), Vector3.one);
+                TileType block = cell.Get(x, y);
+                if (block == TileType.NONE)
+                    cell.Set(x,y, TileType.GRASS);
             }
         }
     }

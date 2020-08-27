@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum BlockType
+public enum TileType
 {
     NONE = 0,
     ENTRANCE,
     EXIT,
-    ROAD
+    ROAD,
+    GRASS,
 }

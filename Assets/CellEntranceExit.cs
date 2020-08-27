@@ -22,7 +22,7 @@ public class CellEntranceExit
     public void Remove(Cell cell)
     {
         foreach (Vector2Int coord in coordinates)
-            cell.Set(coord.x, coord.y, BlockType.NONE);
+            cell.Set(coord.x, coord.y, TileType.NONE);
     }
 
 
@@ -278,7 +278,7 @@ public class CellEntranceExit
             else
                 y1 += offset + j;
 
-            cell.Set(x1, y1, BlockType.ENTRANCE);
+            cell.Set(x1, y1, TileType.ENTRANCE);
             entrance.coordinates.Add(new Vector2Int(x1,y1));
         }
     }
