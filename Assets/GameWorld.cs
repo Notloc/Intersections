@@ -6,11 +6,13 @@ public class GameWorld : MonoBehaviour
 {
     [SerializeField] uint cellSize = 10;
     [SerializeField] Grid grid = null;
+    [SerializeField] CellGenerator generator = null;
     CellGrid cellGrid;
 
     private void Start()
     {
         cellGrid = new CellGrid(grid, cellSize);
+        generator.GenerateCell(Vector2Int.zero, cellSize);
     }
 
 }

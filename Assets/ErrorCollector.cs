@@ -6,10 +6,9 @@ using UnityEngine;
 
 public class ErrorCollector
 {
+    private List<Exception> errors = new List<Exception>();
     public int Count { get { return errors.Count; } }
 
-    private List<Exception> errors = new List<Exception>();
-    
     public void Add(Exception error)
     {
         errors.Add(error);

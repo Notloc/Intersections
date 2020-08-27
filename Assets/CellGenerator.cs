@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CellGenerator : MonoBehaviour
 {
+    private List<Path> drawPaths = new List<Path>();
+
     public Cell GenerateCell(Vector2Int coordinates, uint size)
     {
         GameObject folder = new GameObject(coordinates.ToString());
@@ -32,8 +34,7 @@ public class CellGenerator : MonoBehaviour
 
             // Place entrance
             CellEntranceExit entrance = CellEntranceExit.Create(cell, width, errors);
-            if (errors.Count > 0)
-                continue;
+            errors.GoBoom();
 
             // Place exit
             CellEntranceExit exit = null;
@@ -42,23 +43,23 @@ public class CellGenerator : MonoBehaviour
             {
                 exitTries++;
                 exit = CellEntranceExit.Create(cell, entrance, errors);
-                if (errors.Count > 0)
-                {
-                    entrance.Remove(cell);
-                    break;
-                }
+                errors.GoBoom();
+                break;
+                //if (errors.Count > 0)
+                //{
+                //  entrance.Remove(cell);
+                //break;
+                //}
             }
-            if (errors.Count > 0)
-                continue;
+            errors.GoBoom();
 
             int roadTries = 0;
             while (roadTries < 20)
             {
                 errors.Clear();
                 roadTries++;
-                ConnectRoad(entrance, exit, errors);
-                if (errors.Count > 0)
-                    continue;
+                ConnectRoad(cell, entrance, exit, errors);
+                errors.GoBoom();
 
                 break;
             }
@@ -67,28 +68,42 @@ public class CellGenerator : MonoBehaviour
         }
     }
 
-    private void ConnectRoad(CellEntranceExit entrance, CellEntranceExit exit, ErrorCollector errors)
+    private void ConnectRoad(Cell cell, CellEntranceExit entrance, CellEntranceExit exit, ErrorCollector errors)
     {
 
-        // A*
+        Path path = PathGenerator.GeneratePath(cell, entrance, exit, errors);
 
-        // Start build roads from each end
-            // Place pseudo corner
-                // branch to the lowest cost direction, prefering straight
-                    // Path is complete when roads meet
-                        // Do not optimize
-                        // Trim excess from road that was "hit"
+        if (errors.Count > 0)
+        {
+            Debug.LogError(errors.GetErrorMessages());
+            errors.Clear();
+            drawPaths.Clear();
+        }
+        DisplayPath(path);
+                
+    }
 
+    private void DisplayPath(Path path)
+    {
+        drawPaths.Add(path);
+    }
 
-        // limit allowed intersection of roads
-            // no "2 way" lanes
-            // intersections must not intersect existing intersections or corners
-                // unless the corner can be completely replaced by the intersection
+    private void OnDrawGizmos()
+    {
+        foreach (Path drawPath in drawPaths)
+        {
+            for (int i = 0; i < drawPath.nodes.Count; i++)
+            {
+                Node node = drawPath.nodes[i];
+                if (i == 0)
+                    Gizmos.color = Color.green;
+                else if (i == drawPath.nodes.Count - 1)
+                    Gizmos.color = Color.red;
+                else
+                    Gizmos.color = Color.white;
 
-
-
-
-
-
+                Gizmos.DrawCube(new Vector3(node.position.x, node.position.y, 0f), Vector3.one);
+            }
+        }
     }
 }

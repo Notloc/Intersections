@@ -7,10 +7,13 @@ using UnityEngine.UIElements;
 
 public class CellEntranceExit
 {
+    private const int EDGE_MARGIN = 2;
+
     public Direction Side { get; private set; }
     public uint Width { get; private set; }
-
     public CellEntranceExit Other { get; set; }
+
+    public Vector2Int Position { get; private set; }
 
     private CellEntranceExit() {}
 
@@ -144,7 +147,7 @@ public class CellEntranceExit
                 return false;
         }
 
-        for (int i = 0; i < cell.Size - entrance.Width; i++)
+        for (int i = EDGE_MARGIN; i < cell.Size - entrance.Width - EDGE_MARGIN; i++)
         {
             int count = 0;
             for (int j = 0; j < entrance.Width; j++)
@@ -185,12 +188,12 @@ public class CellEntranceExit
                 searchX = true;
                 break;
 
-            case Direction.EAST:
+            case Direction.WEST:
                 x = 0;
                 y = 0;
                 searchX = false;
                 break;
-            case Direction.WEST:
+            case Direction.EAST:
                 x = (int)cell.Size - 1;
                 y = 0;
                 searchX = false;
@@ -206,7 +209,7 @@ public class CellEntranceExit
         while (tries < 10)
         {
             int count = 0;
-            int index = Random.Range(0, (int)(cell.Size - entrance.Width));
+            int index = Random.Range(EDGE_MARGIN, (int)(cell.Size - entrance.Width - EDGE_MARGIN));
             for (int i = 0; i < entrance.Width; i++)
             {
                 int x1 = x, y1 = y;
@@ -223,13 +226,14 @@ public class CellEntranceExit
             }
             if (count == entrance.Width)
             {
-                Position(cell, entrance, x, y, index, searchX);
+                SetPosition(cell, entrance, x, y, index, searchX);
+                return;
             }
-
+            tries++;
         }
 
         // Give up and just place it in the first possible spot
-        for (int i = 0; i < cell.Size - entrance.Width; i++)
+        for (int i = EDGE_MARGIN; i < cell.Size - entrance.Width - EDGE_MARGIN; i++)
         {
             int count = 0;
             for (int j = 0; j < entrance.Width; j++)
@@ -248,15 +252,24 @@ public class CellEntranceExit
             }
             if (count == entrance.Width)
             {
-                Position(cell, entrance, x, y, i, searchX);
+                SetPosition(cell, entrance, x, y, i, searchX);
                 return;
             }
         }
         errors.Add(new System.Exception("Unable to place the EntranceExit."));
     }
 
-    private static void Position(Cell cell, CellEntranceExit entrance, int x, int y, int offset, bool searchX)
+    private static void SetPosition(Cell cell, CellEntranceExit entrance, int x, int y, int offset, bool searchX)
     {
+        Vector2Int position;
+        if (searchX)
+            position = new Vector2Int(x + offset, y);
+        else
+            position = new Vector2Int(x, y + offset);
+
+        entrance.Position = position;
+
+
         for (int j = 0; j < entrance.Width; j++)
         {
             int x1 = x, y1 = y;
